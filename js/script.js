@@ -22,6 +22,14 @@ let start = document.getElementById("start"),
 	money, 
 	time;
 
+console.log(expensesItemBtn.style);
+
+expensesItemBtn.style.backgroundImage = "none";
+optionalExpensesBtn.style.backgroundImage = "none";
+countBudgetBtn.style.backgroundImage = "none";
+
+console.dir(expensesItemBtn);
+
 let askMoney = function() {
 	time = prompt("Введите дату в формате YYYY-MM-DD");
 	money = +prompt("Ваш бюджет на месяц?");
@@ -37,41 +45,45 @@ let askMoney = function() {
 	yearValue.value = new Date(Date.parse(time)).getFullYear();
 	monthValue.value = new Date(Date.parse(time)).getMonth() + 1;
 	dayValue.value = new Date(Date.parse(time)).getDate();
-};
-let funcExpenses = function() {
+
+	expensesItemBtn.style.backgroundImage = "";
+	optionalExpensesBtn.style.backgroundImage = "";
+	countBudgetBtn.style.backgroundImage = "";
+
+	let funcExpenses = function() {
 	let sum = 0;
 
-	for (let i = 0; i < expensesItem.length; i++) {
-				let a = expensesItem[i].value,
-				    b = expensesItem[++i].value;
-			
-					if ( (typeof(a)) === "string" && (typeof(a) != null) && a != "" 
-					    && b != null && b != "") {
-						appData.expenses[a] = b;
-						sum += +b;
-						expensesValue.textContent = sum;
-					} else {
-						i--
-						console.log(sum);
-					}
-	} 
-};
-let optExp = function() {
-
-	for (i = 0; i < optionalExpensesItem.length; i++) {
-		let opt = optionalExpensesItem[i].value;
-		appData.optionalExpenses[i] = opt;
-		optionalExpensesValue.textContent += optionalExpensesItem[i].value + "," + " ";
+		for (let i = 0; i < expensesItem.length; i++) {
+					let a = expensesItem[i].value,
+					    b = expensesItem[++i].value;
+				
+						if ( (typeof(a)) === "string" && (typeof(a) != null) && a != "" 
+						    && b != null && b != "") {
+							appData.expenses[a] = b;
+							sum += +b;
+							expensesValue.textContent = sum;
+						} else {
+							i--
+							console.log(sum);
+						}
+		} 
 	};
-};
-let countFunc = function() {
-	let outcomes = 0;
+	let optExp = function() {
+
+		for (i = 0; i < optionalExpensesItem.length; i++) {
+			let opt = optionalExpensesItem[i].value;
+			appData.optionalExpenses[i] = opt;
+			optionalExpensesValue.textContent += optionalExpensesItem[i].value + "," + " ";
+		}
+	};
+	let countFunc = function() {
+		let outcomes = 0;
 		for (i of Object.values(appData.expenses)) {
-			outcomes = outcomes + i;
+			outcomes = (outcomes + Number(i));
 		};
 
 		appData.outcomes = outcomes;
-		appData.moneyPerDay = (((appData.budget - appData.outcomes) / 30).toFixed());
+		appData.moneyPerDay = (((appData.budget - (appData.outcomes * 30)) / 30).toFixed());
 		daybudgetValue.textContent = appData.moneyPerDay;
 
 		if (appData.moneyPerDay < 100) {
@@ -82,17 +94,35 @@ let countFunc = function() {
 		levelValue.textContent = "Высокий уровень достатка";
 		} else {
 		levelValue.textContent = "Ошибка"}
-};
-let chooseIncomeFunc = function() {
+		console.log(appData);
+	};
+	let chooseIncomeFunc = function() {
 
-	let items = chooseIncome.value;
-
-	incomeValue.textContent = items;
-	appData.income = items.split(", ");
-	appData.income.sort();
-}
-let chooseSumFunc = function() {
-	if (appData.savings === true) {
+		let items = chooseIncome.value;
+	
+			incomeValue.textContent = items;
+			appData.income = items.split(", ");
+			appData.income.sort();
+			}
+			let chooseSumFunc = function() {
+			if (appData.savings === true) {
+					let sum = +chooseSum.value;
+					let percent = +choosePercent.value;
+					appData.monthIncome = sum / 100 / 12 * percent;
+					appData.yearIncome = sum / 100 * percent;
+					yearSavingsValue.textContent = appData.yearIncome.toFixed(1);
+					monthValue.textContent = appData.monthIncome.toFixed(1);
+			}
+	};
+	let clickFunc = function() {
+		if (appData.savings === true) {
+			appData.savings = false;
+		} else {
+			appData.savings = true;	
+		}
+	};
+	let choosePercentFunc = function() {
+		if (appData.savings === true) {
 			let sum = +chooseSum.value;
 			let percent = +choosePercent.value;
 			appData.monthIncome = sum / 100 / 12 * percent;
@@ -100,33 +130,18 @@ let chooseSumFunc = function() {
 			yearSavingsValue.textContent = appData.yearIncome.toFixed(1);
 			monthValue.textContent = appData.monthIncome.toFixed(1);
 		}
-};
-let clickFunc = function() {
-	if (appData.savings === true) {
-		appData.savings = false;
-	} else {
-		appData.savings = true;	
-	}
-};
-let choosePercentFunc = function() {
-	if (appData.savings === true) {
-		let sum = +chooseSum.value;
-		let percent = +choosePercent.value;
-		appData.monthIncome = sum / 100 / 12 * percent;
-		appData.yearIncome = sum / 100 * percent;
-		yearSavingsValue.textContent = appData.yearIncome.toFixed(1);
-		monthValue.textContent = appData.monthIncome.toFixed(1);
-	}
-}
+	};
+
+	expensesItemBtn.addEventListener("click", funcExpenses);
+	optionalExpensesBtn.addEventListener("click", optExp);
+	countBudgetBtn.addEventListener("click", countFunc);
+	chooseIncome.addEventListener("input", chooseIncomeFunc);
+	savings.addEventListener("click", clickFunc);
+	chooseSum.addEventListener("input", chooseSumFunc);
+	choosePercent.addEventListener("input", choosePercentFunc);
+};	
 
 start.addEventListener("click", askMoney);
-expensesItemBtn.addEventListener("click", funcExpenses);
-optionalExpensesBtn.addEventListener("click", optExp);
-countBudgetBtn.addEventListener("click", countFunc);
-chooseIncome.addEventListener("input", chooseIncomeFunc);
-savings.addEventListener("click", clickFunc);
-chooseSum.addEventListener("input", chooseSumFunc);
-choosePercent.addEventListener("input", choosePercentFunc);
 
 let appData = {
 	budget: money,
@@ -223,3 +238,4 @@ let appData = {
 // 	console.log(`Наша программа включает в себя данные: ${i}: ${appData[i]}`);
 // }
 
+console.log(appData);
